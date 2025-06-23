@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { 
+      font-family: sans-serif; 
+      padding: 10px; 
+      width: 500px; 
+      box-sizing: border-box;
+      background-color: light-dark(#ffffff, #1e1e1e);
+      color: light-dark(#000000, #ffffff);
+    }
+    .tab { 
+      display: flex; 
+      align-items: center; 
+      margin: 5px 0; 
+      min-height: 30px;
+      padding: 5px;
+      border-radius: 4px;
+      background-color: light-dark(#f5f5f5, #2d2d2d);
+    }
+    .tab:hover {
+      background-color: light-dark(#e0e0e0, #3d3d3d);
+    }
+    .tab span { 
+      flex: 1; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      white-space: nowrap; 
+      margin-right: 10px; 
+      min-width: 0; 
+    }
+    .buttons { 
+      display: flex; 
+      flex-shrink: 0; 
+      gap: 5px; 
+    }
+    .buttons button { 
+      padding: 2px 6px; 
+      font-size: 11px; 
+      white-space: nowrap;
+      background-color: light-dark(#ffffff, #404040);
+      color: light-dark(#000000, #ffffff);
+      border: 1px solid light-dark(#cccccc, #555555);
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .buttons button:hover {
+      background-color: light-dark(#f0f0f0, #505050);
+    }
+    h3 {
+      margin-top: 0;
+      color: light-dark(#333333, #ffffff);
+    }
+  </style>
+</head>
+<body>
+  <h3>Quicklist</h3>
+  <div id="list"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

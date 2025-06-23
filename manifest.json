@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Harpoon for Chrome",
+  "version": "1.0",
+  "description": "Quicklist tab jumper like Harpoon for Neovim.",
+  "permissions": ["tabs", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "add-to-quicklist": {
+      "suggested_key": {"default": "Alt+Shift+M"},
+      "description": "Add current tab to quicklist"
+    },
+    "jump-to-tab-1": {"suggested_key": {"default": "Alt+Shift+J"}, "description": "Jump to quicklist tab 1"},
+    "jump-to-tab-2": {"suggested_key": {"default": "Alt+Shift+K"}, "description": "Jump to quicklist tab 2"},
+    "jump-to-tab-3": {"suggested_key": {"default": "Alt+Shift+L"}, "description": "Jump to quicklist tab 3"}
+  },
+  "icons": {"48": "icon.png"}
+}
