@@ -19,8 +19,11 @@
       border-radius: 4px;
       background-color: light-dark(#f5f5f5, #2d2d2d);
     }
-    .tab:hover {
+    .tab:hover, .tab.selected {
       background-color: light-dark(#e0e0e0, #3d3d3d);
+    }
+    .tab.selected {
+      border-left: 3px solid light-dark(#0066cc, #4d9fff);
     }
     .tab span { 
       flex: 1; 
@@ -36,17 +39,62 @@
       gap: 5px; 
     }
     .buttons button { 
-      padding: 2px 6px; 
-      font-size: 11px; 
+      padding: 4px 6px; 
+      font-size: 14px; 
       white-space: nowrap;
       background-color: light-dark(#ffffff, #404040);
       color: light-dark(#000000, #ffffff);
       border: 1px solid light-dark(#cccccc, #555555);
-      border-radius: 3px;
+      border-radius: 4px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 24px;
     }
     .buttons button:hover {
       background-color: light-dark(#f0f0f0, #505050);
+      transform: scale(1.05);
+    }
+    .buttons button:active {
+      transform: scale(0.95);
+    }
+    .arrow-up {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 6px solid light-dark(#666666, #cccccc);
+    }
+    .arrow-down {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 6px solid light-dark(#666666, #cccccc);
+    }
+    .cross {
+      position: relative;
+      width: 10px;
+      height: 10px;
+    }
+    .cross::before,
+    .cross::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 2px;
+      background-color: light-dark(#d32f2f, #ef5350);
+      transform: translate(-50%, -50%);
+    }
+    .cross::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+    .cross::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
     }
     h3 {
       margin-top: 0;
@@ -54,7 +102,7 @@
     }
   </style>
 </head>
-<body>
+<body tabindex="0">
   <h3>Quicklist</h3>
   <div id="list"></div>
   <script src="popup.js"></script>
