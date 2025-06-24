@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Harpoon for Chrome",
+  "name": "Hookmark",
   "version": "1.0",
   "description": "Quicklist tab jumper like Harpoon for Neovim.",
   "permissions": ["tabs", "storage", "activeTab"],

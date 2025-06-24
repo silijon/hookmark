@@ -2,14 +2,14 @@
 (function() {
   'use strict';
 
-  console.log('Webpoon content script loaded');
+  console.log('Hookmark content script loaded');
 
   // Prevent multiple injections
-  if (window.webpoonContentScript) {
-    console.log('Webpoon content script already loaded, skipping');
+  if (window.hookmarkContentScript) {
+    console.log('Hookmark content script already loaded, skipping');
     return;
   }
-  window.webpoonContentScript = true;
+  window.hookmarkContentScript = true;
 
   // Key mappings for shortcuts - using shifted key values
   const keyMappings = {
@@ -71,7 +71,7 @@
     
     // Debug logging - remove after testing
     if (event.altKey && event.shiftKey) {
-      console.log('Webpoon debug:', {
+      console.log('Hookmark debug:', {
         keyString,
         key: event.key,
         code: event.code,
@@ -85,7 +85,7 @@
       event.preventDefault();
       event.stopPropagation();
       
-      console.log('Webpoon executing command:', command);
+      console.log('Hookmark executing command:', command);
       
       // Send message to background script
       chrome.runtime.sendMessage({
