@@ -20,9 +20,9 @@
     'alt+shift+O': 'open-quicklist',
     
     // Jump to tabs - original J/K/L mappings (these work because letters stay the same)
-    'alt+shift+J': 'jump-to-tab-1',
-    'alt+shift+K': 'jump-to-tab-2', 
-    'alt+shift+L': 'jump-to-tab-3',
+    'alt+shift+j': 'jump-to-tab-1',
+    'alt+shift+k': 'jump-to-tab-2', 
+    'alt+shift+l': 'jump-to-tab-3',
     
     // Colon (Shift+semicolon)
     'alt+shift+:': 'jump-to-tab-4',
