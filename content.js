@@ -14,15 +14,18 @@
   // Key mappings for shortcuts - using shifted key values
   const keyMappings = {
     // Add to quicklist
-    'alt+shift+m': 'add-to-quicklist',
+    'alt+shift+H': 'add-to-quicklist',
     
     // Open quicklist popup
-    'alt+shift+o': 'open-quicklist',
+    'alt+shift+O': 'open-quicklist',
     
     // Jump to tabs - original J/K/L mappings (these work because letters stay the same)
-    'alt+shift+j': 'jump-to-tab-1',
-    'alt+shift+k': 'jump-to-tab-2', 
-    'alt+shift+l': 'jump-to-tab-3',
+    'alt+shift+J': 'jump-to-tab-1',
+    'alt+shift+K': 'jump-to-tab-2', 
+    'alt+shift+L': 'jump-to-tab-3',
+    
+    // Colon (Shift+semicolon)
+    'alt+shift+:': 'jump-to-tab-4',
     
     // Jump to tabs - number mappings (shifted numbers become symbols)
     'alt+shift+!': 'jump-to-tab-1', // Shift+1
@@ -34,9 +37,6 @@
     'alt+shift+&': 'jump-to-tab-7', // Shift+7
     'alt+shift+*': 'jump-to-tab-8', // Shift+8
     'alt+shift+(': 'jump-to-tab-9', // Shift+9
-    
-    // Colon (Shift+semicolon)
-    'alt+shift+:': 'jump-to-tab-4'
   };
 
   function getKeyString(event) {

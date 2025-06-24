@@ -20,7 +20,7 @@
   },
   "commands": {
     "add-to-quicklist": {
-      "suggested_key": {"default": "Alt+Shift+M"},
+      "suggested_key": {"default": "Alt+Shift+H"},
       "description": "Add current tab to quicklist"
     },
     "open-quicklist": {
