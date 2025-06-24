@@ -31,6 +31,32 @@ async function executeCommand(command) {
   }
 }
 
+// Inject content script into existing tabs when extension is installed/enabled
+async function injectIntoExistingTabs() {
+  console.log('Injecting content script into existing tabs...');
+  const tabs = await chrome.tabs.query({});
+  console.log(`Found ${tabs.length} tabs`);
+  
+  for (const tab of tabs) {
+    // Skip chrome:// and other special pages that can't run content scripts
+    if (!tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extension://') && !tab.url.startsWith('edge://') && !tab.url.startsWith('about:')) {
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['content.js']
+        });
+        console.log(`Injected into tab ${tab.id}: ${tab.url}`);
+      } catch (e) {
+        // Ignore errors for tabs that can't execute scripts
+        console.log(`Could not inject content script into tab ${tab.id}: ${e.message}`);
+      }
+    }
+  }
+}
+
+chrome.runtime.onInstalled.addListener(injectIntoExistingTabs);
+chrome.runtime.onStartup.addListener(injectIntoExistingTabs);
+
 // Keep the original commands API for Chrome internal pages
 chrome.commands.onCommand.addListener(executeCommand);
 

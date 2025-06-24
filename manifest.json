@@ -3,7 +3,8 @@
   "name": "Hookmark",
   "version": "1.0",
   "description": "Quicklist tab jumper like Harpoon for Neovim.",
-  "permissions": ["tabs", "storage", "activeTab"],
+  "permissions": ["tabs", "storage", "activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

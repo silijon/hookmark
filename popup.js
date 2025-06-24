@@ -115,13 +115,13 @@ function handleKeydown(event) {
     case 'j':
     case 'ArrowDown':
       event.preventDefault();
-      selectedIndex = Math.min(selectedIndex + 1, maxIndex);
+      selectedIndex = selectedIndex + 1 > maxIndex ? 0 : selectedIndex + 1;
       updateSelection();
       break;
     case 'k':
     case 'ArrowUp':
       event.preventDefault();
-      selectedIndex = Math.max(selectedIndex - 1, 0);
+      selectedIndex = selectedIndex - 1 < 0 ? maxIndex : selectedIndex - 1;
       updateSelection();
       break;
     case 'Enter':
