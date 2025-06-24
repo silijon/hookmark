@@ -57,15 +57,6 @@
   }
 
   function handleKeydown(event) {
-    // Don't trigger in form elements
-    if (['input', 'textarea', 'select'].includes(event.target.tagName.toLowerCase())) {
-      return;
-    }
-    
-    // Don't trigger if user is typing in contenteditable
-    if (event.target.contentEditable === 'true') {
-      return;
-    }
 
     const keyString = getKeyString(event);
     
