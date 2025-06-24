@@ -95,9 +95,14 @@ async function jumpToSelectedTab() {
       await chrome.windows.update(tabInfo.windowId, {focused: true});
       window.close(); // Close popup after jumping
     } catch (e) {
-      console.error("Tab may have been closed.", e);
-      // Remove the dead tab and reload
-      await removeTab(selectedIndex);
+      console.log("Tab was closed, opening new tab with URL:", tab.url);
+      // Tab was closed, open a new tab with the stored URL
+      const newTab = await chrome.tabs.create({url: tab.url, active: true});
+      // Update the quicklist item with the new tab ID
+      quicklist[selectedIndex].id = newTab.id;
+      quicklist[selectedIndex].title = newTab.title || quicklist[selectedIndex].title;
+      await chrome.storage.local.set({quicklist});
+      window.close(); // Close popup after opening new tab
     }
   }
 }

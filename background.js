@@ -19,7 +19,13 @@ async function executeCommand(command) {
         const tab = await chrome.tabs.get(quicklist[index].id);
         await chrome.windows.update(tab.windowId, {focused: true});
       } catch (e) {
-        console.error("Tab may have been closed.", e);
+        console.log("Tab was closed, opening new tab with URL:", quicklist[index].url);
+        // Tab was closed, open a new tab with the stored URL
+        const newTab = await chrome.tabs.create({url: quicklist[index].url, active: true});
+        // Update the quicklist item with the new tab ID
+        quicklist[index].id = newTab.id;
+        quicklist[index].title = newTab.title || quicklist[index].title;
+        await chrome.storage.local.set({quicklist});
       }
     }
   }
