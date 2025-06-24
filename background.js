@@ -31,6 +31,33 @@ async function executeCommand(command) {
   }
 }
 
+// Reconnect quicklist to existing tabs after browser restart
+async function reconnectQuicklistTabs() {
+  console.log('Reconnecting quicklist to existing tabs...');
+  const quicklist = (await chrome.storage.local.get("quicklist")).quicklist || [];
+  if (quicklist.length === 0) return;
+
+  const tabs = await chrome.tabs.query({});
+  console.log(`Found ${tabs.length} tabs, quicklist has ${quicklist.length} items`);
+  
+  let updated = false;
+  for (const quicklistItem of quicklist) {
+    // Find existing tab with matching URL
+    const matchingTab = tabs.find(tab => tab.url === quicklistItem.url);
+    if (matchingTab && matchingTab.id !== quicklistItem.id) {
+      console.log(`Reconnecting quicklist item "${quicklistItem.title}" to existing tab ${matchingTab.id}`);
+      quicklistItem.id = matchingTab.id;
+      quicklistItem.title = matchingTab.title;
+      updated = true;
+    }
+  }
+  
+  if (updated) {
+    await chrome.storage.local.set({quicklist});
+    console.log('Quicklist reconnected to existing tabs');
+  }
+}
+
 // Inject content script into existing tabs when extension is installed/enabled
 async function injectIntoExistingTabs() {
   console.log('Injecting content script into existing tabs...');
@@ -54,8 +81,15 @@ async function injectIntoExistingTabs() {
   }
 }
 
-chrome.runtime.onInstalled.addListener(injectIntoExistingTabs);
-chrome.runtime.onStartup.addListener(injectIntoExistingTabs);
+chrome.runtime.onInstalled.addListener(async () => {
+  await reconnectQuicklistTabs();
+  await injectIntoExistingTabs();
+});
+
+chrome.runtime.onStartup.addListener(async () => {
+  await reconnectQuicklistTabs();
+  await injectIntoExistingTabs();
+});
 
 // Keep the original commands API for Chrome internal pages
 chrome.commands.onCommand.addListener(executeCommand);
