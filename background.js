@@ -6,6 +6,13 @@ async function executeCommand(command) {
     if (!quicklist.find(t => t.id === tab.id)) {
       quicklist.push({id: tab.id, title: tab.title, url: tab.url});
       await chrome.storage.local.set({quicklist});
+      
+      // Send flash message to content script
+      try {
+        await chrome.tabs.sendMessage(tab.id, {action: 'showFlash'});
+      } catch (e) {
+        console.log('Could not send flash message to tab:', e.message);
+      }
     }
   } else if (command === "open-quicklist") {
     // Open the popup programmatically

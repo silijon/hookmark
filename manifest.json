@@ -31,5 +31,11 @@
     "jump-to-tab-1": {"suggested_key": {"default": "Alt+Shift+J"}, "description": "Jump to quicklist tab 1"},
     "jump-to-tab-2": {"suggested_key": {"default": "Alt+Shift+K"}, "description": "Jump to quicklist tab 2"}
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["hook.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "icons": {"48": "icon.png"}
 }
