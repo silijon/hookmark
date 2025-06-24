@@ -14,10 +14,13 @@
   // Key mappings for shortcuts - using shifted key values
   const keyMappings = {
     // Add to quicklist
-    'alt+shift+H': 'add-to-quicklist',
+    'alt+shift+h': 'add-to-quicklist',
     
     // Open quicklist popup
-    'alt+shift+O': 'open-quicklist',
+    'alt+shift+o': 'open-quicklist',
+    
+    // Toggle back to last active tab
+    'alt+shift+b': 'toggle-back',
     
     // Jump to tabs - original J/K/L mappings (these work because letters stay the same)
     'alt+shift+j': 'jump-to-tab-1',

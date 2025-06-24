@@ -29,7 +29,7 @@
       "description": "Open quicklist popup"
     },
     "jump-to-tab-1": {"suggested_key": {"default": "Alt+Shift+J"}, "description": "Jump to quicklist tab 1"},
-    "jump-to-tab-2": {"suggested_key": {"default": "Alt+Shift+K"}, "description": "Jump to quicklist tab 2"}
+    "toggle-back": {"suggested_key": {"default": "Alt+Shift+B"}, "description": "Toggle back to last active tab"}
   },
   "web_accessible_resources": [
     {

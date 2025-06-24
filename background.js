@@ -1,3 +1,17 @@
+// Track the last active tab for toggle back functionality
+let lastActiveTabId = null;
+let currentActiveTabId = null;
+
+// Update last active tab when tab activation changes
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  // Store the previous tab as the last active tab
+  if (currentActiveTabId && currentActiveTabId !== activeInfo.tabId) {
+    lastActiveTabId = currentActiveTabId;
+    console.log('Toggle back: Previous tab stored:', lastActiveTabId);
+  }
+  currentActiveTabId = activeInfo.tabId;
+});
+
 // Handle commands from both the commands API and content script messages
 async function executeCommand(command) {
   if (command === "add-to-quicklist") {
@@ -34,6 +48,21 @@ async function executeCommand(command) {
         quicklist[index].title = newTab.title || quicklist[index].title;
         await chrome.storage.local.set({quicklist});
       }
+    }
+  } else if (command === "toggle-back") {
+    console.log('Toggle back command received, lastActiveTabId:', lastActiveTabId);
+    if (lastActiveTabId) {
+      try {
+        await chrome.tabs.update(lastActiveTabId, {active: true});
+        const tab = await chrome.tabs.get(lastActiveTabId);
+        await chrome.windows.update(tab.windowId, {focused: true});
+        console.log('Toggle back: Switched to tab', lastActiveTabId);
+      } catch (e) {
+        console.log("Last active tab was closed or doesn't exist:", e.message);
+        lastActiveTabId = null;
+      }
+    } else {
+      console.log('Toggle back: No last active tab stored');
     }
   }
 }

@@ -23,10 +23,11 @@ Hookmark allows you to create a quicklist of tabs and jump between them using ke
 ### Primary Shortcuts
 - `Alt+Shift+H` - Add current tab to quicklist
 - `Alt+Shift+O` - Open quicklist popup
+- `Alt+Shift+B` - Toggle back to last active tab
 - `Alt+Shift+J` - Jump to quicklist tab 1
-- `Alt+Shift+K` - Jump to quicklist tab 2
 
 ### Extended Shortcuts
+- `Alt+Shift+K` - Jump to tab 2
 - `Alt+Shift+L` - Jump to tab 3
 - `Alt+Shift+:` - Jump to tab 4
 - `Alt+Shift+1` through `Alt+Shift+9` - Jump to tabs 1-9 using symbol keys
