@@ -29,7 +29,8 @@
     
     // Colon (Shift+semicolon)
     'alt+shift+:': 'jump-to-tab-4',
-    
+    'alt+shift+"': 'jump-to-tab-5',
+
     // Jump to tabs - number mappings (shifted numbers become symbols)
     'alt+shift+!': 'jump-to-tab-1', // Shift+1
     'alt+shift+@': 'jump-to-tab-2', // Shift+2
