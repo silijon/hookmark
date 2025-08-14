@@ -17,8 +17,10 @@ async function executeCommand(command) {
   if (command === "add-to-quicklist") {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
     const quicklist = (await chrome.storage.local.get("quicklist")).quicklist || [];
-    if (!quicklist.find(t => t.id === tab.id)) {
-      // Add new tab to the beginning of the list (index 0) instead of the end
+    const existingIndex = quicklist.findIndex(t => t.id === tab.id);
+    
+    if (existingIndex === -1) {
+      // Tab not in quicklist - add it
       quicklist.unshift({id: tab.id, title: tab.title, url: tab.url});
       await chrome.storage.local.set({quicklist});
       
@@ -38,6 +40,17 @@ async function executeCommand(command) {
         await chrome.tabs.sendMessage(tab.id, {action: 'showFlash'});
       } catch (e) {
         console.log('Could not send flash message to tab:', e.message);
+      }
+    } else {
+      // Tab already in quicklist - remove it
+      quicklist.splice(existingIndex, 1);
+      await chrome.storage.local.set({quicklist});
+      
+      // Unpin the tab
+      try {
+        await chrome.tabs.update(tab.id, {pinned: false});
+      } catch (e) {
+        console.log('Could not unpin tab:', e.message);
       }
     }
   } else if (command === "open-quicklist") {
