@@ -53,6 +53,16 @@ async function loadQuicklist() {
 
 async function removeTab(index) {
   const { quicklist } = await chrome.storage.local.get("quicklist");
+  const tabToRemove = quicklist[index];
+  
+  // Unpin the tab if it's currently pinned
+  try {
+    await chrome.tabs.update(tabToRemove.id, {pinned: false});
+  } catch (e) {
+    // Tab might be closed already, ignore error
+    console.log('Could not unpin tab (might be closed):', e.message);
+  }
+  
   quicklist.splice(index, 1);
   await chrome.storage.local.set({ quicklist });
   

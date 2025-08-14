@@ -22,6 +22,17 @@ async function executeCommand(command) {
       quicklist.unshift({id: tab.id, title: tab.title, url: tab.url});
       await chrome.storage.local.set({quicklist});
       
+      // Pin the tab and move it to the leftmost position
+      try {
+        // First pin the tab
+        await chrome.tabs.update(tab.id, {pinned: true});
+        
+        // Then move it to the leftmost position (index 0)
+        await chrome.tabs.move(tab.id, {index: 0});
+      } catch (e) {
+        console.log('Could not move and pin tab:', e.message);
+      }
+      
       // Send flash message to content script
       try {
         await chrome.tabs.sendMessage(tab.id, {action: 'showFlash'});
