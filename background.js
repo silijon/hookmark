@@ -18,7 +18,8 @@ async function executeCommand(command) {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
     const quicklist = (await chrome.storage.local.get("quicklist")).quicklist || [];
     if (!quicklist.find(t => t.id === tab.id)) {
-      quicklist.push({id: tab.id, title: tab.title, url: tab.url});
+      // Add new tab to the beginning of the list (index 0) instead of the end
+      quicklist.unshift({id: tab.id, title: tab.title, url: tab.url});
       await chrome.storage.local.set({quicklist});
       
       // Send flash message to content script
