@@ -1,4 +1,5 @@
 let selectedIndex = 0;
+let isUpdatingFromMove = false;
 
 async function loadQuicklist() {
   const listEl = document.getElementById("list");
@@ -7,7 +8,7 @@ async function loadQuicklist() {
   
   if (!quicklist || quicklist.length === 0) {
     const emptyMsg = document.createElement("div");
-    emptyMsg.textContent = "No tabs in quicklist";
+    emptyMsg.textContent = "No pinned tabs";
     emptyMsg.style.color = "light-dark(#666, #999)";
     emptyMsg.style.padding = "10px";
     listEl.appendChild(emptyMsg);
@@ -55,7 +56,7 @@ async function removeTab(index) {
   const { quicklist } = await chrome.storage.local.get("quicklist");
   const tabToRemove = quicklist[index];
   
-  // Unpin the tab if it's currently pinned
+  // Unpin the tab
   try {
     await chrome.tabs.update(tabToRemove.id, {pinned: false});
   } catch (e) {
@@ -63,6 +64,7 @@ async function removeTab(index) {
     console.log('Could not unpin tab (might be closed):', e.message);
   }
   
+  // Remove from quicklist
   quicklist.splice(index, 1);
   await chrome.storage.local.set({ quicklist });
   
@@ -78,11 +80,27 @@ async function moveTab(index, direction) {
   const { quicklist } = await chrome.storage.local.get("quicklist");
   const newIndex = index + direction;
   if (newIndex >= 0 && newIndex < quicklist.length) {
+    // Swap items in quicklist
     [quicklist[index], quicklist[newIndex]] = [quicklist[newIndex], quicklist[index]];
-    await chrome.storage.local.set({ quicklist });
     
     // Update selected index to follow the moved item
     selectedIndex = newIndex;
+    
+    // Temporarily disable the storage listener to prevent double rendering
+    isUpdatingFromMove = true;
+    
+    await chrome.storage.local.set({ quicklist });
+    
+    // Request background script to reorder the actual pinned tabs
+    chrome.runtime.sendMessage({
+      action: 'reorderPinnedTabs',
+      quicklist: quicklist
+    });
+    
+    // Re-enable the listener after a brief delay
+    setTimeout(() => {
+      isUpdatingFromMove = false;
+    }, 100);
     
     loadQuicklist();
   }
@@ -105,14 +123,11 @@ async function jumpToSelectedTab() {
       await chrome.windows.update(tabInfo.windowId, {focused: true});
       window.close(); // Close popup after jumping
     } catch (e) {
-      console.log("Tab was closed, opening new tab with URL:", tab.url);
-      // Tab was closed, open a new tab with the stored URL
-      const newTab = await chrome.tabs.create({url: tab.url, active: true});
-      // Update the quicklist item with the new tab ID
-      quicklist[selectedIndex].id = newTab.id;
-      quicklist[selectedIndex].title = newTab.title || quicklist[selectedIndex].title;
+      console.log("Tab no longer exists:", e.message);
+      // Remove from quicklist if tab doesn't exist
+      quicklist.splice(selectedIndex, 1);
       await chrome.storage.local.set({quicklist});
-      window.close(); // Close popup after opening new tab
+      loadQuicklist();
     }
   }
 }
@@ -168,4 +183,11 @@ document.addEventListener("keydown", handleKeydown);
 // Focus the popup for keyboard navigation
 window.addEventListener("load", () => {
   document.body.focus();
+});
+
+// Listen for storage changes to refresh the list when tabs are added/removed
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.quicklist && !isUpdatingFromMove) {
+    loadQuicklist();
+  }
 });

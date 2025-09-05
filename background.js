@@ -12,6 +12,58 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
   currentActiveTabId = activeInfo.tabId;
 });
 
+// Sync pinned tabs to quicklist on startup
+async function syncPinnedTabsToQuicklist() {
+  console.log('Syncing pinned tabs to quicklist...');
+  
+  // Get all pinned tabs sorted by index
+  const pinnedTabs = await chrome.tabs.query({ pinned: true });
+  pinnedTabs.sort((a, b) => a.index - b.index);
+  
+  // Create quicklist from pinned tabs (no URLs stored, just IDs and titles)
+  const quicklist = pinnedTabs.map(tab => ({
+    id: tab.id,
+    title: tab.title
+  }));
+  
+  await chrome.storage.local.set({ quicklist });
+  console.log(`Synced ${quicklist.length} pinned tabs to quicklist`);
+}
+
+// Listen for tab updates (including pinned state changes)
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if ('pinned' in changeInfo) {
+    if (!changeInfo.pinned) {
+      // Tab was unpinned - remove from quicklist
+      console.log('Tab unpinned, removing from quicklist:', tabId);
+      const quicklist = (await chrome.storage.local.get("quicklist")).quicklist || [];
+      const newQuicklist = quicklist.filter(t => t.id !== tabId);
+      await chrome.storage.local.set({ quicklist: newQuicklist });
+    }
+  }
+});
+
+// Listen for tab removal
+chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+  console.log('Tab removed, removing from quicklist if present:', tabId);
+  const quicklist = (await chrome.storage.local.get("quicklist")).quicklist || [];
+  const newQuicklist = quicklist.filter(t => t.id !== tabId);
+  if (newQuicklist.length !== quicklist.length) {
+    await chrome.storage.local.set({ quicklist: newQuicklist });
+    console.log('Removed tab from quicklist');
+  }
+});
+
+// Listen for tab movement to maintain correct order
+chrome.tabs.onMoved.addListener(async (tabId, moveInfo) => {
+  const tab = await chrome.tabs.get(tabId);
+  if (tab.pinned) {
+    // If a pinned tab is moved, resync the entire quicklist
+    console.log('Pinned tab moved, resyncing quicklist');
+    await syncPinnedTabsToQuicklist();
+  }
+});
+
 // Handle commands from both the commands API and content script messages
 async function executeCommand(command) {
   if (command === "add-to-quicklist") {
@@ -20,19 +72,25 @@ async function executeCommand(command) {
     const existingIndex = quicklist.findIndex(t => t.id === tab.id);
     
     if (existingIndex === -1) {
-      // Tab not in quicklist - add it
-      quicklist.unshift({id: tab.id, title: tab.title, url: tab.url});
-      await chrome.storage.local.set({quicklist});
-      
-      // Pin the tab and move it to the leftmost position
+      // Tab not in quicklist - pin it and add to quicklist
       try {
         // First pin the tab
         await chrome.tabs.update(tab.id, {pinned: true});
         
-        // Then move it to the leftmost position (index 0)
-        await chrome.tabs.move(tab.id, {index: 0});
+        // Get all pinned tabs to find correct position
+        const pinnedTabs = await chrome.tabs.query({ pinned: true });
+        pinnedTabs.sort((a, b) => a.index - b.index);
+        
+        // Move to the end of pinned tabs (will be at the leftmost available position)
+        const targetIndex = pinnedTabs.length - 1;
+        await chrome.tabs.move(tab.id, {index: targetIndex});
+        
+        // Add to quicklist at the end
+        quicklist.push({id: tab.id, title: tab.title});
+        await chrome.storage.local.set({quicklist});
+        
       } catch (e) {
-        console.log('Could not move and pin tab:', e.message);
+        console.log('Could not pin tab:', e.message);
       }
       
       // Send flash message to content script
@@ -42,7 +100,7 @@ async function executeCommand(command) {
         console.log('Could not send flash message to tab:', e.message);
       }
     } else {
-      // Tab already in quicklist - remove it
+      // Tab already in quicklist - unpin and remove from quicklist
       quicklist.splice(existingIndex, 1);
       await chrome.storage.local.set({quicklist});
       
@@ -65,12 +123,9 @@ async function executeCommand(command) {
         const tab = await chrome.tabs.get(quicklist[index].id);
         await chrome.windows.update(tab.windowId, {focused: true});
       } catch (e) {
-        console.log("Tab was closed, opening new tab with URL:", quicklist[index].url);
-        // Tab was closed, open a new tab with the stored URL
-        const newTab = await chrome.tabs.create({url: quicklist[index].url, active: true});
-        // Update the quicklist item with the new tab ID
-        quicklist[index].id = newTab.id;
-        quicklist[index].title = newTab.title || quicklist[index].title;
+        console.log("Tab no longer exists:", e.message);
+        // Remove from quicklist if tab doesn't exist
+        quicklist.splice(index, 1);
         await chrome.storage.local.set({quicklist});
       }
     }
@@ -89,33 +144,6 @@ async function executeCommand(command) {
     } else {
       console.log('Toggle back: No last active tab stored');
     }
-  }
-}
-
-// Reconnect quicklist to existing tabs after browser restart
-async function reconnectQuicklistTabs() {
-  console.log('Reconnecting quicklist to existing tabs...');
-  const quicklist = (await chrome.storage.local.get("quicklist")).quicklist || [];
-  if (quicklist.length === 0) return;
-
-  const tabs = await chrome.tabs.query({});
-  console.log(`Found ${tabs.length} tabs, quicklist has ${quicklist.length} items`);
-  
-  let updated = false;
-  for (const quicklistItem of quicklist) {
-    // Find existing tab with matching URL
-    const matchingTab = tabs.find(tab => tab.url === quicklistItem.url);
-    if (matchingTab && matchingTab.id !== quicklistItem.id) {
-      console.log(`Reconnecting quicklist item "${quicklistItem.title}" to existing tab ${matchingTab.id}`);
-      quicklistItem.id = matchingTab.id;
-      quicklistItem.title = matchingTab.title;
-      updated = true;
-    }
-  }
-  
-  if (updated) {
-    await chrome.storage.local.set({quicklist});
-    console.log('Quicklist reconnected to existing tabs');
   }
 }
 
@@ -143,12 +171,12 @@ async function injectIntoExistingTabs() {
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
-  await reconnectQuicklistTabs();
+  await syncPinnedTabsToQuicklist();
   await injectIntoExistingTabs();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
-  await reconnectQuicklistTabs();
+  await syncPinnedTabsToQuicklist();
   await injectIntoExistingTabs();
 });
 
@@ -160,5 +188,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'executeCommand') {
     executeCommand(request.command);
     sendResponse({success: true});
+  } else if (request.action === 'reorderPinnedTabs') {
+    // Handle reordering from popup
+    reorderPinnedTabs(request.quicklist).then(() => {
+      sendResponse({success: true});
+    });
+    return true; // Keep message channel open for async response
   }
 });
+
+// Reorder pinned tabs based on new quicklist order
+async function reorderPinnedTabs(quicklist) {
+  console.log('Reordering pinned tabs to match quicklist');
+  
+  // Move each tab to its correct position based on quicklist order
+  for (let i = 0; i < quicklist.length; i++) {
+    try {
+      await chrome.tabs.move(quicklist[i].id, { index: i });
+    } catch (e) {
+      console.log(`Could not move tab ${quicklist[i].id}:`, e.message);
+    }
+  }
+}
