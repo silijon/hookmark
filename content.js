@@ -11,36 +11,24 @@
   }
   window.hookmarkContentScript = true;
 
-  // Key mappings for shortcuts - using shifted key values
+  // Key mappings for shortcuts
   const keyMappings = {
     // Add to quicklist
-    'alt+shift+h': 'add-to-quicklist',
+    'alt+h': 'add-to-quicklist',
+    'alt+shift+h': 'add-to-quicklist-leftmost',  // Add to leftmost position
     
     // Open quicklist popup
-    'alt+shift+o': 'open-quicklist',
+    'alt+o': 'open-quicklist',
     
     // Toggle back to last active tab
-    'alt+shift+b': 'toggle-back',
+    'alt+b': 'toggle-back',
     
-    // Jump to tabs - original J/K/L mappings (these work because letters stay the same)
-    'alt+shift+j': 'jump-to-tab-1',
-    'alt+shift+k': 'jump-to-tab-2', 
-    'alt+shift+l': 'jump-to-tab-3',
-    
-    // Colon (Shift+semicolon)
-    'alt+shift+:': 'jump-to-tab-4',
-    'alt+shift+"': 'jump-to-tab-5',
-
-    // Jump to tabs - number mappings (shifted numbers become symbols)
-    'alt+shift+!': 'jump-to-tab-1', // Shift+1
-    'alt+shift+@': 'jump-to-tab-2', // Shift+2
-    'alt+shift+#': 'jump-to-tab-3', // Shift+3
-    'alt+shift+$': 'jump-to-tab-4', // Shift+4
-    'alt+shift+%': 'jump-to-tab-5', // Shift+5
-    'alt+shift+^': 'jump-to-tab-6', // Shift+6
-    'alt+shift+&': 'jump-to-tab-7', // Shift+7
-    'alt+shift+*': 'jump-to-tab-8', // Shift+8
-    'alt+shift+(': 'jump-to-tab-9', // Shift+9
+    // Jump to tabs using letters
+    'alt+j': 'jump-to-tab-1',
+    'alt+k': 'jump-to-tab-2', 
+    'alt+l': 'jump-to-tab-3',
+    'alt+;': 'jump-to-tab-4',
+    'alt+\'': 'jump-to-tab-5',
   };
 
   function getKeyString(event) {
@@ -51,10 +39,8 @@
     if (event.shiftKey) parts.push('shift');
     if (event.metaKey) parts.push('meta');
     
-    // Handle special keys
+    // Use the key directly
     let key = event.key.toLowerCase();
-    if (key === ';') key = ';';
-    if (key === ':') key = ':';
     
     parts.push(key);
     return parts.join('+');
@@ -65,7 +51,7 @@
     const keyString = getKeyString(event);
     
     // Debug logging - remove after testing
-    if (event.altKey && event.shiftKey) {
+    if (event.altKey && !event.shiftKey && !event.ctrlKey) {
       console.log('Hookmark debug:', {
         keyString,
         key: event.key,

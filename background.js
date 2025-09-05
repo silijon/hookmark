@@ -66,7 +66,7 @@ chrome.tabs.onMoved.addListener(async (tabId, moveInfo) => {
 
 // Handle commands from both the commands API and content script messages
 async function executeCommand(command) {
-  if (command === "add-to-quicklist") {
+  if (command === "add-to-quicklist" || command === "add-to-quicklist-leftmost") {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
     const quicklist = (await chrome.storage.local.get("quicklist")).quicklist || [];
     const existingIndex = quicklist.findIndex(t => t.id === tab.id);
@@ -77,16 +77,25 @@ async function executeCommand(command) {
         // First pin the tab
         await chrome.tabs.update(tab.id, {pinned: true});
         
-        // Get all pinned tabs to find correct position
-        const pinnedTabs = await chrome.tabs.query({ pinned: true });
-        pinnedTabs.sort((a, b) => a.index - b.index);
+        if (command === "add-to-quicklist-leftmost") {
+          // Move to leftmost position (index 0)
+          await chrome.tabs.move(tab.id, {index: 0});
+          
+          // Add to quicklist at the beginning
+          quicklist.unshift({id: tab.id, title: tab.title});
+        } else {
+          // Get all pinned tabs to find correct position
+          const pinnedTabs = await chrome.tabs.query({ pinned: true });
+          pinnedTabs.sort((a, b) => a.index - b.index);
+          
+          // Move to the end of pinned tabs
+          const targetIndex = pinnedTabs.length - 1;
+          await chrome.tabs.move(tab.id, {index: targetIndex});
+          
+          // Add to quicklist at the end
+          quicklist.push({id: tab.id, title: tab.title});
+        }
         
-        // Move to the end of pinned tabs (will be at the leftmost available position)
-        const targetIndex = pinnedTabs.length - 1;
-        await chrome.tabs.move(tab.id, {index: targetIndex});
-        
-        // Add to quicklist at the end
-        quicklist.push({id: tab.id, title: tab.title});
         await chrome.storage.local.set({quicklist});
         
       } catch (e) {

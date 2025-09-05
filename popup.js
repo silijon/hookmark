@@ -66,7 +66,16 @@ async function removeTab(index) {
   
   // Remove from quicklist
   quicklist.splice(index, 1);
+  
+  // Temporarily disable the storage listener to prevent double rendering
+  isUpdatingFromMove = true;
+  
   await chrome.storage.local.set({ quicklist });
+  
+  // Re-enable the listener after a brief delay
+  setTimeout(() => {
+    isUpdatingFromMove = false;
+  }, 100);
   
   // Adjust selected index after removal
   if (selectedIndex >= quicklist.length) {
