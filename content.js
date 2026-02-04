@@ -11,24 +11,25 @@
   }
   window.hookmarkContentScript = true;
 
-  // Key mappings for shortcuts
+  // Key mappings for shortcuts using event.code (physical key)
+  // This works cross-platform since Mac's Option key produces special characters with event.key
   const keyMappings = {
     // Add to quicklist
-    'alt+h': 'add-to-quicklist',
-    'alt+shift+h': 'add-to-quicklist-leftmost',  // Add to leftmost position
+    'alt+KeyH': 'add-to-quicklist',
+    'alt+shift+KeyH': 'add-to-quicklist-leftmost',
     
     // Open quicklist popup
-    'alt+o': 'open-quicklist',
+    'alt+KeyO': 'open-quicklist',
     
     // Toggle back to last active tab
-    'alt+b': 'toggle-back',
+    'alt+KeyB': 'toggle-back',
     
     // Jump to tabs using letters
-    'alt+j': 'jump-to-tab-1',
-    'alt+k': 'jump-to-tab-2', 
-    'alt+l': 'jump-to-tab-3',
-    'alt+;': 'jump-to-tab-4',
-    'alt+\'': 'jump-to-tab-5',
+    'alt+KeyJ': 'jump-to-tab-1',
+    'alt+KeyK': 'jump-to-tab-2', 
+    'alt+KeyL': 'jump-to-tab-3',
+    'alt+Semicolon': 'jump-to-tab-4',
+    'alt+Quote': 'jump-to-tab-5',
   };
 
   function getKeyString(event) {
@@ -39,10 +40,8 @@
     if (event.shiftKey) parts.push('shift');
     if (event.metaKey) parts.push('meta');
     
-    // Use the key directly
-    let key = event.key.toLowerCase();
-    
-    parts.push(key);
+    // Use event.code (physical key) for cross-platform compatibility
+    parts.push(event.code);
     return parts.join('+');
   }
 
@@ -50,14 +49,9 @@
 
     const keyString = getKeyString(event);
     
-    // Debug logging - remove after testing
-    if (event.altKey && !event.shiftKey && !event.ctrlKey) {
-      console.log('Hookmark debug:', {
-        keyString,
-        key: event.key,
-        code: event.code,
-        command: keyMappings[keyString]
-      });
+    // Debug logging
+    if (event.altKey && !event.ctrlKey && keyMappings[keyString]) {
+      console.log('Hookmark:', keyString, '->', keyMappings[keyString]);
     }
     
     const command = keyMappings[keyString];
