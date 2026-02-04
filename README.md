@@ -20,17 +20,26 @@ Hookmark allows you to create a quicklist of tabs and jump between them using ke
 
 ## Keyboard Shortcuts
 
-### Primary Shortcuts
-- `Alt+Shift+H` - Add current tab to quicklist
-- `Alt+Shift+O` - Open quicklist popup
-- `Alt+Shift+B` - Toggle back to last active tab
-- `Alt+Shift+J` - Jump to quicklist tab 1
+### Primary Shortcuts (Work Automatically)
+- `Alt+H` - Add current tab to quicklist
+- `Alt+Shift+H` - Add current tab to leftmost position
+- `Alt+O` - Open quicklist popup
+- `Alt+B` - Toggle back to last active tab
 
-### Extended Shortcuts
-- `Alt+Shift+K` - Jump to tab 2
-- `Alt+Shift+L` - Jump to tab 3
-- `Alt+Shift+:` - Jump to tab 4
-- `Alt+Shift+1` through `Alt+Shift+9` - Jump to tabs 1-9 using symbol keys
+### Extended Shortcuts (Manual Configuration Required)
+The following shortcuts work out-of-box for most pages, however, if you want them to work reliably on system pages (like `chrome://extensions`), it requires a one-time manual configuration:
+
+1. Navigate to `chrome://extensions/shortcuts`
+2. Scroll to "Hookmark"
+3. Configure your preferred shortcuts for:
+   - Jump to tab 1-9 commands
+
+**Recommended shortcuts:**
+- `Alt+J` - Jump to tab 1
+- `Alt+K` - Jump to tab 2
+- `Alt+L` - Jump to tab 3
+- `Alt+;` - Jump to tab 4
+- `Alt+1` through `Alt+5` - Jump to tabs 5-9
 
 ### Popup Navigation
 - `j/k` or `↑/↓` - Navigate quicklist

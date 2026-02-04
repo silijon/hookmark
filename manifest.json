@@ -32,7 +32,19 @@
       "suggested_key": {"default": "Alt+O"},
       "description": "Open quicklist popup"
     },
-    "toggle-back": {"suggested_key": {"default": "Alt+B"}, "description": "Toggle back to last active tab"}
+    "toggle-back": {
+      "suggested_key": {"default": "Alt+B"},
+      "description": "Toggle back to last active tab"
+    },
+    "jump-to-tab-1": {"description": "Jump to tab 1 in quicklist"},
+    "jump-to-tab-2": {"description": "Jump to tab 2 in quicklist"},
+    "jump-to-tab-3": {"description": "Jump to tab 3 in quicklist"},
+    "jump-to-tab-4": {"description": "Jump to tab 4 in quicklist"},
+    "jump-to-tab-5": {"description": "Jump to tab 5 in quicklist"},
+    "jump-to-tab-6": {"description": "Jump to tab 6 in quicklist"},
+    "jump-to-tab-7": {"description": "Jump to tab 7 in quicklist"},
+    "jump-to-tab-8": {"description": "Jump to tab 8 in quicklist"},
+    "jump-to-tab-9": {"description": "Jump to tab 9 in quicklist"}
   },
   "web_accessible_resources": [
     {
